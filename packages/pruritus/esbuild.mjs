@@ -2,13 +2,13 @@ import { build } from "esbuild";
 
 build({
     entryPoints: ["src/index.ts"],
-    bundle: true,
     outdir: "../../dist/pruritus/",
     sourcemap: "external",
+    platform: "node",
+    bundle: true,
     minify: true,
     loader: {},
     plugins: [],
-    platform: "node",
     alias: {
         "@itch": "kitch/src"
     },
