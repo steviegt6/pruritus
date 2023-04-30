@@ -1,0 +1,8 @@
+{
+  "name": "pruritus",
+  "version": "1.0.0",
+  "description": "itch.io desktop app modding platform",
+  "scripts": {},
+  "author": "Tomat",
+  "license": "MIT"
+}

@@ -1,0 +1,21 @@
+{
+  "scripts": {
+    "build": "cd packages/pruritus && tsc",
+    "build-types": "cd packages/pruritus-types-itch && tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/steviegt6/pruritus.git"
+  },
+  "author": "Tomat",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/steviegt6/pruritus/issues"
+  },
+  "homepage": "https://github.com/steviegt6/pruritus#readme",
+  "dependencies": {
+    "eslint": "^8.39.0",
+    "prettier": "^2.8.8",
+    "typescript": "^5.0.4"
+  }
+}

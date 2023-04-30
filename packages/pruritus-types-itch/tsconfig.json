@@ -1,0 +1,13 @@
+{
+  "files": ["index.d.ts"],
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "jsx": "react",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "outDir": "../../dist/pruritus-types-itch"
+  }
+}
