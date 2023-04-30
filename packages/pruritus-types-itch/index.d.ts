@@ -8000,7 +8000,7 @@ declare module "renderer/App/Layout/StatusBar" {
      * Displays our current progress when checking for updates, etc.
      */
     class StatusBar extends React.PureComponent<Props> {
-        constructor(props: StatusBar["props"], context: any);
+        constructor(props: StatusBar["props"], context?: any);
         render(): JSX.Element;
     }
     interface Props {
@@ -8399,7 +8399,7 @@ declare module "renderer/scenes/GateScene/LoginForm/index" {
     import { Dispatch } from "common/types/index";
     import React from "react";
     class LoginForm extends React.PureComponent<Props, State> {
-        constructor(props: Props, context: any);
+        constructor(props: Props, context?: any);
         render(): JSX.Element;
         openRegisterPage: () => void;
         openPasswordResetPage: () => void;
@@ -8472,7 +8472,7 @@ declare module "renderer/scenes/GateScene/LoginScreen" {
     import React from "react";
     import { Watcher } from "renderer/hocs/watching";
     class LoginScreen extends React.PureComponent<Props, State> {
-        constructor(props: LoginScreen["props"], context: any);
+        constructor(props: LoginScreen["props"], context?: any);
         componentDidMount(): void;
         subscribe(watcher: Watcher): void;
         refresh(): void;
@@ -12132,7 +12132,7 @@ declare module "renderer/scenes/HubScene/Sidebar/Sidebar" {
         newIndex: number;
     }
     class Sidebar extends React.PureComponent<Props, State> {
-        constructor(props: Sidebar["props"], context: any);
+        constructor(props: Sidebar["props"], context?: any);
         closeAllTabs: () => void;
         newTab: () => void;
         onSortEnd: (params: SortEndParams) => void;
@@ -12476,7 +12476,7 @@ declare module "renderer/modal-widgets/ClearBrowsingData" {
     import React from "react";
     import { ModalWidgetProps } from "common/modals/index";
     class ClearBrowsingData extends React.PureComponent<Props, State> {
-        constructor(props: ClearBrowsingData["props"], context: any);
+        constructor(props: ClearBrowsingData["props"], context?: any);
         componentDidMount(): void;
         change(state: Partial<State>): void;
         doUpdatePayload(state: State): void;
@@ -12674,7 +12674,7 @@ declare module "renderer/modal-widgets/RecaptchaInput" {
     class RecaptchaInput extends React.PureComponent<RecaptchaInputProps, State> {
         webview: Electron.WebviewTag;
         checker: number;
-        constructor(props: RecaptchaInput["props"], context: any);
+        constructor(props: RecaptchaInput["props"], context?: any);
         render(): JSX.Element;
         gotWebview: (wv: Electron.WebviewTag) => void;
         componentWillUnmount(): void;
@@ -12772,7 +12772,7 @@ declare module "renderer/modal-widgets/ShowError" {
     import React from "react";
     import { ModalWidgetProps } from "common/modals/index";
     class ShowError extends React.PureComponent<Props, State> {
-        constructor(props: ShowError["props"], context: any);
+        constructor(props: ShowError["props"], context?: any);
         render(): JSX.Element;
         renderGameStuff(): JSX.Element;
         renderErrorStuff(): JSX.Element;
@@ -12973,7 +12973,7 @@ declare module "renderer/App/AppContents" {
 declare module "renderer/App/index" {
     import React from "react";
     class App extends React.PureComponent<Props, State> {
-        constructor(props: App["props"], context: any);
+        constructor(props: App["props"], context?: any);
         render(): JSX.Element;
         logProfile: (id: any, phase: any, actualTime: any, baseTime: any, startTime: any, commitTime: any) => void;
         realRender(): JSX.Element;
