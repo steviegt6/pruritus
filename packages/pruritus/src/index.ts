@@ -1,4 +1,4 @@
-import bootstrap from "bootstrap";
+import { bootstrapMain } from "@pruritus/bootstrap";
 
 console.log(`Running in: ${__dirname}`);
-bootstrap();
+bootstrapMain();

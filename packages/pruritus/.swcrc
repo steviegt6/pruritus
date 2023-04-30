@@ -1,0 +1,20 @@
+{
+    "$schema": "https://json.schemastore.org/swcrc",
+    "module": {
+        "type": "commonjs",
+        "strict": true
+    },
+    "jsc": {
+        "baseUrl": "./src/",
+        "target": "es2020",
+        "parser": {
+            "syntax": "typescript",
+            "tsx": true
+        },
+        "paths": {
+            "@pruritus/*": ["./*"],
+            "@itch/*": ["kitch/src/*"]
+        }
+    },
+    "sourceMaps": true
+}

@@ -1,7 +1,7 @@
 {
   "scripts": {
     "prebuild": "tsc -p ./packages/toolchain/tsconfig.json",
-    "build": "cd packages/pruritus && node esbuild.mjs",
+    "build": "cd packages/pruritus && npx swc ./src/ --out-dir ../../dist/pruritus --config-file ./.swcrc",
     "dev": "node dist/toolchain/index.js dev",
     "inject": "node dist/toolchain/index.js install",
     "postinstall": "npm run prebuild"

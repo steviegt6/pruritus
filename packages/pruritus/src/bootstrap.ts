@@ -1,16 +1,23 @@
 import path from "path";
 import fs from "fs";
 
-export default function bootstrap() {
-    console.log("Bootstrapping launch...");
-
-    console.log("Patching bundles...");
-    const main = patchBundles();
+export function bootstrapMain() {
+    console.log("Bootstrapping main...");
 
     console.log("Patching `require`...");
     patchRequire();
 
+    console.log("Patching bundles...");
+    const main = patchBundles();
+
     require(main);
+}
+
+export function bootstrapRenderer() {
+    console.log("Bootstrapping renderer...");
+
+    console.log("Patching `require`...");
+    patchRequire();
 }
 
 function patchBundles() {
@@ -40,6 +47,7 @@ function patchBundles() {
     let rendererData = fs.readFileSync(renderer, "utf8");
     rendererData = rendererData.replace("var installedModules = {};", "global.installedModules = {}; global.modules = modules;");
     rendererData = rendererData.replace("__webpack_require__.e = ", "global.__webpack_require__ = __webpack_require__; __webpack_require__.e = ");
+    rendererData = 'require("../../pruritus/bootstrap.js").bootstrapRenderer();' + rendererData + '\nrequire("./resources/app/pruritus/renderer.js")';
     // rendererData = rendererData.replace("module.exports =", "global.whatthefuckisthis = module.exports =");
     fs.writeFileSync(patchedRenderer, rendererData, "utf8");
     console.log("Writing to " + patchedRenderer);
@@ -48,25 +56,35 @@ function patchBundles() {
 }
 
 function patchRequire() {
-    const oldRequire = require;
-    require = Object.assign(
+    const Module = require("module");
+    const oldRequire = Module.prototype.require;
+    Module.prototype.require = Object.assign(
         (id: string) => {
             console.log("Requiring: " + id);
 
             if (id.startsWith("kitch/src/")) {
                 const name = "./src/" + id.substring("kitch/src/".length) + ".ts";
                 if (!modules[name]) console.error("Cannot resolve kitch (main doesn't use named modules!): " + name);
-                return __webpack_require__(name);
+                console.log("Resolving kitch module: " + name);
+                return resolveExports(global.__webpack_require__(name));
+            } else if (id.startsWith("./kitch/src/")) {
+                const name = "./src/" + id.substring("./kitch/src/".length) + ".ts";
+                if (!modules[name]) console.error("Cannot resolve kitch (main doesn't use named modules!): " + name);
+                console.log("Resolving kitch module: " + name);
+                return resolveExports(global.__webpack_require__(name));
             }
 
             try {
                 return oldRequire(id);
             } catch {
                 try {
+                    console.log("Failed to resolve, assuming node_modules: " + id);
                     const name = "./node_modules" + id + ".js";
-                    if (!modules[name]) console.error("Cannot resolve node_modules: " + name);
-                    return global.__webpack_require__(name);
+                    return resolveExports(global.__webpack_require__(name));
                 } catch {
+                    console.error("Failed to resolve as kitch, relative path, and node_modules: " + id);
+                    console.log(process.cwd());
+                    console.log(fs.readdirSync("."));
                     return undefined;
                 }
             }
@@ -75,4 +93,9 @@ function patchRequire() {
             ...oldRequire
         }
     );
+    console.log(require);
+}
+
+function resolveExports(module: any): any {
+    return module;
 }

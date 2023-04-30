@@ -6,11 +6,12 @@
         "importHelpers": true,
         "esModuleInterop": true,
         "jsx": "react",
-        "skipLibCheck": false,
+        "skipLibCheck": true,
 
         "baseUrl": "./src",
         "outDir": "../../dist/pruritus",
         "paths": {
+            "@pruritus/*": ["./*"],
             "@itch/*": ["../node_modules/kitch/src/*"]
         },
 

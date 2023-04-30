@@ -28,7 +28,7 @@ export type Module = {
 /**
  * Webpack module require function.
  */
-export type WebpackModuleRequire = (moduleId: ModuleKey) => Module;
+export type WebpackModuleRequire = (moduleId: ModuleKey) => any;
 
 /**
  * Webpack module resolver.
