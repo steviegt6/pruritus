@@ -1,7 +1,10 @@
 {
   "scripts": {
-    "build": "cd packages/pruritus && tsc",
-    "build-types": "cd packages/pruritus-types-itch && tsc"
+    "prebuild": "tsc -p ./packages/toolchain/tsconfig.json",
+    "build": "tsc -p packages/pruritus/tsconfig.json",
+    "dev": "node dist/toolchain/index.js dev",
+    "inject": "node dist/toolchain/index.js install",
+    "postinstall": "npm run prebuild"
   },
   "repository": {
     "type": "git",
@@ -14,8 +17,10 @@
   },
   "homepage": "https://github.com/steviegt6/pruritus#readme",
   "dependencies": {
+    "@types/prompts": "^2.4.4",
     "eslint": "^8.39.0",
     "prettier": "^2.8.8",
+    "prompts": "^2.4.2",
     "typescript": "^5.0.4"
   }
 }

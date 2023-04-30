@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "jsx": "react",
@@ -9,6 +8,9 @@
     "strict": true,
     "skipLibCheck": true,
     "baseUrl": "./src",
-    "outDir": "../../dist/pruritus"
+    "outDir": "../../dist/pruritus",
+    "paths": {
+      "@itch/*": ["../node_modules/kitch/src/*"]
+    }
   }
 }

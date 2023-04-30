@@ -1,0 +1,7 @@
+{
+    "name": "toolchain",
+    "description": "build toolchain",
+    "private": true,
+    "license": "MIT",
+    "main": ""
+}
