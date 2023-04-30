@@ -21,38 +21,43 @@ export function bootstrapRenderer() {
 }
 
 function patchBundles() {
-    const main = path.join(__dirname, "../dist/main/main.bundle.js");
-    const patchedMain = path.join(__dirname, "../dist/main/main.bundle.patched.js");
-    const index = path.join(__dirname, "../dist/renderer/index.html");
-    const patchedIndex = path.join(__dirname, "../dist/renderer/index.modified.html");
-    const renderer = path.join(__dirname, "../dist/renderer/renderer.bundle.js");
-    const patchedRenderer = path.join(__dirname, "../dist/renderer/renderer.bundle.patched.js");
-
-    console.log("Patching " + main);
-    let mainData = fs.readFileSync(main, "utf8");
-    mainData = mainData.replace("var installedModules = {};", "global.installedModules = {}; global.modules = modules;");
-    mainData = mainData.replace("__webpack_require__.m = ", "global.__webpack_require__ = __webpack_require__; __webpack_require__.m = ");
-    mainData = mainData.replace("index.html", "index.modified.html");
     // mainData = mainData.replace("module.exports =", "global.whatthefuckisthis = module.exports =");
-    fs.writeFileSync(patchedMain, mainData, "utf8");
-    console.log("Writing to " + patchedMain);
-
-    console.log("Patching " + index);
-    let indexData = fs.readFileSync(index, "utf8");
-    indexData = indexData.replace("renderer.bundle.js", "renderer.bundle.patched.js");
-    fs.writeFileSync(patchedIndex, indexData, "utf8");
-    console.log("Writing to " + patchedIndex);
-
-    console.log("Patching " + renderer);
-    let rendererData = fs.readFileSync(renderer, "utf8");
-    rendererData = rendererData.replace("var installedModules = {};", "global.installedModules = {}; global.modules = modules;");
-    rendererData = rendererData.replace("__webpack_require__.e = ", "global.__webpack_require__ = __webpack_require__; __webpack_require__.e = ");
-    rendererData = 'require("../../pruritus/bootstrap.js").bootstrapRenderer();' + rendererData + '\nrequire("./resources/app/pruritus/renderer.js")';
     // rendererData = rendererData.replace("module.exports =", "global.whatthefuckisthis = module.exports =");
-    fs.writeFileSync(patchedRenderer, rendererData, "utf8");
-    console.log("Writing to " + patchedRenderer);
+
+    const patchedMain = patchFile("../dist/main/main.bundle.js", (text) => {
+        text = text.replace("var installedModules = {};", "global.installedModules = {}; global.modules = modules;");
+        text = text.replace("__webpack_require__.m = ", "global.__webpack_require__ = __webpack_require__; __webpack_require__.m = ");
+        text = text.replace("index.html", "index.modified.html");
+        return text;
+    });
+
+    patchFile("../dist/renderer/index.html", (text) => {
+        text = text.replace("renderer.bundle.js", "renderer.bundle.patched.js");
+        return text;
+    });
+
+    patchFile("../dist/renderer/renderer.bundle.js", (text) => {
+        text = text.replace("var installedModules = {};", "global.installedModules = {}; global.modules = modules;");
+        text = text.replace("__webpack_require__.e = ", "global.__webpack_require__ = __webpack_require__; __webpack_require__.e = ");
+        text = 'require("../../pruritus/bootstrap.js").bootstrapRenderer();' + text + '\nrequire("./resources/app/pruritus/renderer.js")';
+        return text;
+    });
 
     return patchedMain;
+}
+
+function patchFile(fromPath: string, patcher: (text: string) => string): string {
+    fromPath = path.join(__dirname, fromPath);
+    const toPath = fromPath.replace(path.extname(fromPath), ".patched" + path.extname(fromPath));
+
+    console.log("Patching: " + fromPath);
+    let data = fs.readFileSync(fromPath, "utf8");
+    data = patcher(data);
+
+    console.log("Writing to: " + toPath);
+    fs.writeFileSync(toPath, data, "utf8");
+
+    return toPath;
 }
 
 function patchRequire() {
