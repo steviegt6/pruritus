@@ -14,6 +14,8 @@ console.log("Running: " + main);
 let mainData = fs.readFileSync(main, "utf8");
 mainData = mainData.replace("var installedModules = {};", "global.installedModules = {}; global.modules = modules;");
 mainData = mainData.replace("index.html", "index.modified.html");
+mainData = mainData.replace("__webpack_require__.e = ", "global.__webpack_require__ = __webpack_require__; __webpack_require__.e = ");
+// mainData = mainData.replace("module.exports =", "global.whatthefuckisthis = module.exports =");
 fs.writeFileSync(patchedMain, mainData, "utf8");
 
 let indexData = fs.readFileSync(index, "utf8");
@@ -22,6 +24,8 @@ fs.writeFileSync(patchedIndex, indexData, "utf8");
 
 let rendererData = fs.readFileSync(renderer, "utf8");
 rendererData = rendererData.replace("var installedModules = {};", "global.installedModules = {}; global.modules = modules;");
+rendererData = rendererData.replace("__webpack_require__.e = ", "global.__webpack_require__ = __webpack_require__; __webpack_require__.e = ");
+// rendererData = rendererData.replace("module.exports =", "global.whatthefuckisthis = module.exports =");
 fs.writeFileSync(patchedRenderer, rendererData, "utf8");
 
 require(patchedMain);
