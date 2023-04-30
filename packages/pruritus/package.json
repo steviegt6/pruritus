@@ -6,6 +6,9 @@
   "author": "Tomat",
   "license": "MIT",
   "dependencies": {
-    "kitch": "github:itchio/itch#f88c47b9db45882872f3ad2d647c83b702ae4584"
+    "@cumjar/websmack": "^1.2.0",
+    "electron": "^11.5.0",
+    "kitch": "github:itchio/itch#f88c47b9db45882872f3ad2d647c83b702ae4584",
+    "spitroast": "^1.4.2"
   }
 }

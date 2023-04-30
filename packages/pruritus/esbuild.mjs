@@ -10,6 +10,7 @@ build({
     plugins: [],
     platform: "node",
     alias: {
-        "@itch": "../node_modules/kitch/src/*"
-    }
+        "@itch": "kitch/src"
+    },
+    external: ["kitch"]
 });
