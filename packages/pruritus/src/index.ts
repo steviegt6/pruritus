@@ -12,7 +12,7 @@ console.log(`Running in: ${__dirname}`);
 console.log("Running: " + main);
 
 let mainData = fs.readFileSync(main, "utf8");
-mainData = mainData.replace("var installedModules = {};", "global.installedModules = {};");
+mainData = mainData.replace("var installedModules = {};", "global.installedModules = {}; global.modules = modules;");
 mainData = mainData.replace("index.html", "index.modified.html");
 fs.writeFileSync(patchedMain, mainData, "utf8");
 
@@ -21,7 +21,7 @@ indexData = indexData.replace("renderer.bundle.js", "renderer.bundle.patched.js"
 fs.writeFileSync(patchedIndex, indexData, "utf8");
 
 let rendererData = fs.readFileSync(renderer, "utf8");
-rendererData = rendererData.replace("var installedModules = {};", "global.installedModules = {};");
+rendererData = rendererData.replace("var installedModules = {};", "global.installedModules = {}; global.modules = modules;");
 fs.writeFileSync(patchedRenderer, rendererData, "utf8");
 
 require(patchedMain);
