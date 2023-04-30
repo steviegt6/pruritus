@@ -102,5 +102,6 @@ function patchRequire() {
 }
 
 function resolveExports(module: any): any {
+    // TODO: Resolve Webpack module exports; lots of work to do.
     return module;
 }
