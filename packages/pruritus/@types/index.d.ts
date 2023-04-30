@@ -1,6 +1,6 @@
 /**
  * Indexer for `globalThis.installedModules` and `globalThis.modules`.
- * Integers are used while indexing for the bundle entrypoint, strings are used as paths for actual modules.
+ * Integers are used for unnamed modules, strings for named modules.
  */
 export type ModuleKey = string | number;
 

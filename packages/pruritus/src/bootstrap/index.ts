@@ -24,7 +24,7 @@ function patchBundles() {
     console.log("Patching " + main);
     let mainData = fs.readFileSync(main, "utf8");
     mainData = mainData.replace("var installedModules = {};", "global.installedModules = {}; global.modules = modules;");
-    mainData = mainData.replace("__webpack_require__.e = ", "global.__webpack_require__ = __webpack_require__; __webpack_require__.e = ");
+    mainData = mainData.replace("__webpack_require__.m = ", "global.__webpack_require__ = __webpack_require__; __webpack_require__.m = ");
     mainData = mainData.replace("index.html", "index.modified.html");
     // mainData = mainData.replace("module.exports =", "global.whatthefuckisthis = module.exports =");
     fs.writeFileSync(patchedMain, mainData, "utf8");
@@ -52,7 +52,24 @@ function patchRequire() {
     require = Object.assign(
         (id: string) => {
             console.log("Requiring: " + id);
-            return oldRequire(id);
+
+            if (id.startsWith("kitch/src/")) {
+                const name = "./src/" + id.substring("kitch/src/".length) + ".ts";
+                if (!modules[name]) console.error("Cannot resolve kitch (main doesn't use named modules!): " + name);
+                return __webpack_require__(name);
+            }
+
+            try {
+                return oldRequire(id);
+            } catch {
+                try {
+                    const name = "./node_modules" + id + ".js";
+                    if (!modules[name]) console.error("Cannot resolve node_modules: " + name);
+                    return global.__webpack_require__(name);
+                } catch {
+                    return undefined;
+                }
+            }
         },
         {
             ...oldRequire
