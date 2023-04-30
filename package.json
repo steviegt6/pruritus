@@ -1,7 +1,7 @@
 {
   "scripts": {
     "prebuild": "tsc -p ./packages/toolchain/tsconfig.json",
-    "build": "tsc -p packages/pruritus/tsconfig.json",
+    "build": "cd packages/pruritus && node esbuild.mjs",
     "dev": "node dist/toolchain/index.js dev",
     "inject": "node dist/toolchain/index.js install",
     "postinstall": "npm run prebuild"
@@ -22,5 +22,8 @@
     "prettier": "^2.8.8",
     "prompts": "^2.4.2",
     "typescript": "^5.0.4"
+  },
+  "devDependencies": {
+    "esbuild": "^0.17.18"
   }
 }
