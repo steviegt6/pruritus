@@ -1,0 +1,21 @@
+{
+    "$schema": "https://json.schemastore.org/swcrc",
+    "module": {
+        "type": "commonjs",
+        "strict": true
+    },
+    "jsc": {
+        // "baseUrl": "./src/",
+        "target": "es2022",
+        "parser": {
+            "syntax": "typescript",
+            "tsx": true
+        },
+        "paths": {
+            // These are defined in tsconfig.json but handled specially by our hijacked require() function.
+            //"@pruritus/*": ["./*"],
+            //"@itch/*": ["kitch/src/*"]
+        }
+    },
+    "sourceMaps": true
+}

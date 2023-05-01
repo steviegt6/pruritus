@@ -1,20 +1,19 @@
 const fs = require("fs");
 const path = require("path");
+const { transformFileSync } = require("@swc/core");
 
 const mainPackage = require("./package.json");
 console.log(mainPackage.dependencies);
 
-const copiedDeps = [];
-copyDeps(mainPackage.dependencies);
+const foundDeps = [];
+resolveDeps(mainPackage.dependencies);
 
-function copyDeps(deps) {
-    console.log("Copying dependencies...", deps);
+function resolveDeps(deps) {
+    console.log("Resolving dependencies...", deps);
 
     for (const dep in deps) {
-        if (copiedDeps.includes(dep)) continue;
-        copiedDeps.push(dep);
+        if (foundDeps.includes(dep)) continue;
         const depPackage = require("./node_modules/" + dep + "/package.json");
-        copyDeps(depPackage.dependencies);
 
         console.log("Copying " + dep + "...");
         let depPath = "./node_modules/" + dep;
@@ -28,20 +27,35 @@ function copyDeps(deps) {
             console.log(`Auto-detected real root from main ("${depPath}"): ` + depPackage.main);
         }
 
-        fs.mkdirSync(depDest, { recursive: true });
-        copyDirSync(depPath, depDest);
+        foundDeps.push({ name: dep, path: depPath, dest: depDest });
+        resolveDeps(depPackage.dependencies);
+
+        //fs.mkdirSync(depDest, { recursive: true });
+        //copyDirSync(depPath, depDest);
     }
 }
 
-function copyDirSync(src, dest) {
+// transpile all found deps with swc
+for (const dep of foundDeps) {
+    console.log("Transpiling " + dep.name + "... (to " + dep.dest + ")");
+
+    transformDirSync(dep.path, dep.dest);
+}
+
+function transformDirSync(src, dest) {
     const entries = fs.readdirSync(src, { withFileTypes: true });
     for (const entry of entries) {
         const srcPath = path.join(src, entry.name);
         const destPath = path.join(dest, entry.name);
-        if (entry.isDirectory()) copyDirSync(srcPath, destPath);
+        if (entry.isDirectory()) transformDirSync(srcPath, destPath);
         else {
-            fs.mkdirSync(path.dirname(destPath), { recursive: true });
-            fs.copyFileSync(srcPath, destPath);
+            fs.mkdirSync(dest, { recursive: true });
+            const output = transformFileSync(srcPath.replaceAll("\\", "/"), {
+                outputPath: destPath,
+                configFile: "./deps.swcrc"
+            });
+            fs.writeFileSync(destPath, output.code);
+            fs.writeFileSync(destPath + ".map", output.map);
         }
     }
 }

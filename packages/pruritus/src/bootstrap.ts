@@ -113,12 +113,20 @@ function patchRequire(relativeToApp: string) {
             }
 
             try {
-                console.log("Attempting to resolve as built-in: " + id);
+                console.log("Attempting to resolve as relative or core module: " + id, __dirname);
                 return oldRequire(id);
             } catch {
-                id = path.isAbsolute(id) ? id : path.join(appRoot, id);
-                console.log("Failed, resolving as absolute non-alias: " + id);
-                return oldRequire(id);
+                const originalFile = getStack()[4].getFileName();
+                const originalDir = path.dirname(originalFile);
+                console.log("Failed, attempting to qualify potentially relative path: " + originalDir);
+
+                try {
+                    return oldRequire(path.join(originalDir, id));
+                } catch {
+                    id = path.isAbsolute(id) ? id : path.join(appRoot, id);
+                    console.log("Failed, resolving as absolute non-alias: " + id);
+                    return oldRequire(id);
+                }
             }
         },
         {
@@ -131,4 +139,17 @@ function patchRequire(relativeToApp: string) {
 function resolveExports(module: any): any {
     // TODO: Resolve Webpack module exports; lots of work to do.
     return module;
+}
+
+type CallSite = {
+    getFileName(): string;
+};
+
+function getStack(): CallSite[] {
+    const oldPrepareStackTrace = Error.prepareStackTrace;
+    Error.prepareStackTrace = (_, stack) => stack;
+    const stack = new Error().stack;
+    Error.prepareStackTrace = oldPrepareStackTrace;
+    // @ts-ignore
+    return stack;
 }
