@@ -11,7 +11,14 @@ export default interface Task {
     run(): Promise<void>;
 }
 
-export const TASKS: Task[] = [new BuildTask(), new CopyTask(), new DevTask(), new InjectTask(), new InstallTask(), new RunTask()];
+export const TASKS: Task[] = [
+    new BuildTask(),
+    new CopyTask(),
+    new DevTask(),
+    new InjectTask(),
+    new InstallTask(),
+    new RunTask(false)
+];
 
 export async function execTask(task: Task) {
     await task.run();

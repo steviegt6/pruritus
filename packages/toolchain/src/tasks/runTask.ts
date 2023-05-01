@@ -7,20 +7,39 @@ import prompts from "prompts";
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 
 const PLATFORM_RUNNERS = {
-    win32: (dir: string) => {
+    win32: (dir: string, enableDevTools: boolean) => {
         const itchDir = readdirSync(dir);
         const executable = join(dir, itchDir.filter((x) => x.endsWith(".exe"))[0]);
         console.log("Running: " + executable);
-        logAndWait(spawn(`"${executable}"`, [], { shell: true, detached: true }));
+        logAndWait(
+            spawn(`"${executable}"`, [], {
+                // @ts-ignore
+                env: { DEVTOOLS: +enableDevTools, development: +enableDevTools },
+                shell: true,
+                detached: true
+            })
+        );
     },
-    darwin: (_dir: string) => {
+    darwin: (_dir: string, _enableDevTools: boolean) => {
         console.log("Contribute macOS support @ https://github.com/steviegt6/pruritus");
     },
-    linux: (dir: string) => {
+    linux: (dir: string, enableDevTools: boolean) => {
         const itchDir = readdirSync(dir);
-        const executable = join(dir, itchDir.filter((x) => x.toLowerCase().startsWith("itch") && !x.endsWith(".desktop") && !x.endsWith(".png"))[0]);
+        const executable = join(
+            dir,
+            itchDir.filter(
+                (x) => x.toLowerCase().startsWith("itch") && !x.endsWith(".desktop") && !x.endsWith(".png")
+            )[0]
+        );
         console.log("Running: " + executable);
-        logAndWait(spawn(executable, { shell: true, detached: true }));
+        logAndWait(
+            spawn(executable, {
+                // @ts-ignore
+                env: { DEVTOOLS: +enableDevTools, development: +enableDevTools },
+                shell: true,
+                detached: true
+            })
+        );
     }
 };
 
@@ -35,6 +54,11 @@ function logAndWait(proc: ChildProcessWithoutNullStreams) {
 
 export default class RunTask implements Task {
     name: string = "run";
+    enableDevTools: boolean;
+
+    constructor(enableDevTools: boolean) {
+        this.enableDevTools = enableDevTools;
+    }
 
     async run(): Promise<void> {
         console.log("Finding itch install location...");
@@ -48,7 +72,8 @@ export default class RunTask implements Task {
                     name: "itchDir",
                     message: "Please enter the location of your itch install:",
                     validate: (value) => {
-                        if (readdirSync(value).filter((x) => x.toLowerCase().startsWith("itch")).length > 0) return true;
+                        if (readdirSync(value).filter((x) => x.toLowerCase().startsWith("itch")).length > 0)
+                            return true;
                         else return "Could not find itch executable in that directory!";
                     }
                 })
@@ -57,6 +82,6 @@ export default class RunTask implements Task {
 
         console.log("Running itch...");
         console.log("Using directory: " + itchDir);
-        PLATFORM_RUNNERS[getPlatform()](itchDir!);
+        PLATFORM_RUNNERS[getPlatform()](itchDir!, this.enableDevTools);
     }
 }

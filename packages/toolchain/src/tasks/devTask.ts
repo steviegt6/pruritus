@@ -11,6 +11,6 @@ export default class DevTask implements Task {
         await execTask(new BuildTask());
         await execTask(new CopyTask());
         await execTask(new InjectTask());
-        await execTask(new RunTask());
+        await execTask(new RunTask(true));
     }
 }
