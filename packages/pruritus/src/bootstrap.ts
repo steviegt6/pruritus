@@ -1,11 +1,11 @@
 import path from "path";
 import fs from "fs";
 
-export function bootstrapMain() {
+export function bootstrapMain(relativeToApp: string) {
     console.log("Bootstrapping main...");
 
     console.log("Patching `require`...");
-    patchRequire();
+    patchRequire(relativeToApp);
 
     console.log("Patching bundles...");
     const main = patchBundles();
@@ -13,11 +13,11 @@ export function bootstrapMain() {
     require(main);
 }
 
-export function bootstrapRenderer() {
+export function bootstrapRenderer(relativeToApp: string) {
     console.log("Bootstrapping renderer...");
 
     console.log("Patching `require`...");
-    patchRequire();
+    patchRequire(relativeToApp);
 }
 
 function patchBundles() {
@@ -26,7 +26,10 @@ function patchBundles() {
 
     const patchedMain = patchFile("../dist/main/main.bundle.js", (text) => {
         text = text.replace("var installedModules = {};", "global.installedModules = {}; global.modules = modules;");
-        text = text.replace("__webpack_require__.m = ", "global.__webpack_require__ = __webpack_require__; __webpack_require__.m = ");
+        text = text.replace(
+            "__webpack_require__.m = ",
+            "global.__webpack_require__ = __webpack_require__; __webpack_require__.m = "
+        );
         text = text.replace("index.html", "index.modified.html");
         return text;
     });
@@ -38,8 +41,14 @@ function patchBundles() {
 
     patchFile("../dist/renderer/renderer.bundle.js", (text) => {
         text = text.replace("var installedModules = {};", "global.installedModules = {}; global.modules = modules;");
-        text = text.replace("__webpack_require__.e = ", "global.__webpack_require__ = __webpack_require__; __webpack_require__.e = ");
-        text = 'require("../../pruritus/bootstrap.js").bootstrapRenderer();' + text + '\nrequire("./resources/app/pruritus/renderer.js")';
+        text = text.replace(
+            "__webpack_require__.e = ",
+            "global.__webpack_require__ = __webpack_require__; __webpack_require__.e = "
+        );
+        text =
+            'require("../../pruritus/bootstrap.js").bootstrapRenderer("../");' +
+            text +
+            '\nrequire("@pruritus/renderer")';
         return text;
     });
 
@@ -60,38 +69,56 @@ function patchFile(fromPath: string, patcher: (text: string) => string): string 
     return toPath;
 }
 
-function patchRequire() {
+type Alias = {
+    root: string;
+    webpack: boolean;
+    extension: string;
+};
+
+const requireAliases: { [k: string]: Alias } = {
+    "@itch/": { root: "./src/", webpack: true, extension: ".ts" },
+    "@itch-modules/": { root: "./node_modules/", webpack: true, extension: ".js" },
+    "@pruritus/": { root: "./pruritus/", webpack: false, extension: ".js" },
+    "@spitroast": { root: "./pruritus/node_modules/spitroast/index.js", webpack: false, extension: "" }
+};
+
+function patchRequire(relativeToApp: string) {
     const Module = require("module");
     const oldRequire = Module.prototype.require;
+    const appRoot = path.join(__dirname, relativeToApp);
+    console.log("require patched in __dirname, appRoot: " + __dirname + ", " + appRoot);
     Module.prototype.require = Object.assign(
         (id: string) => {
-            console.log("Requiring: " + id);
+            for (const [alias, { root, webpack, extension }] of Object.entries(requireAliases)) {
+                let isDir = false;
+                if (alias.endsWith("/") && id.startsWith(alias)) isDir = true;
+                else if (!alias.endsWith("/") && id === alias) isDir = false;
+                else continue;
 
-            if (id.startsWith("kitch/src/")) {
-                const name = "./src/" + id.substring("kitch/src/".length) + ".ts";
-                if (!modules[name]) console.error("Cannot resolve kitch (main doesn't use named modules!): " + name);
-                console.log("Resolving kitch module: " + name);
-                return resolveExports(global.__webpack_require__(name));
-            } else if (id.startsWith("./kitch/src/")) {
-                const name = "./src/" + id.substring("./kitch/src/".length) + ".ts";
-                if (!modules[name]) console.error("Cannot resolve kitch (main doesn't use named modules!): " + name);
-                console.log("Resolving kitch module: " + name);
-                return resolveExports(global.__webpack_require__(name));
+                console.log("Resolving as alias '" + alias + "': " + id);
+
+                let name = isDir ? root + id.substring(alias.length) : root;
+                // add ext if missing
+                if (isDir && !path.extname(name) && !name.endsWith(extension)) name += extension;
+                else if (isDir && path.extname(name))
+                    name = name.substring(0, name.length - path.extname(name).length) + extension;
+
+                if (webpack) {
+                    console.log("Resolving webpack module: " + name);
+                    return resolveExports(global.__webpack_require__(name));
+                } else {
+                    console.log("Resolving module: " + appRoot + name);
+                    return oldRequire(appRoot + name);
+                }
             }
 
             try {
+                console.log("Attempting to resolve as built-in: " + id);
                 return oldRequire(id);
             } catch {
-                try {
-                    console.log("Failed to resolve, assuming node_modules: " + id);
-                    const name = "./node_modules" + id + ".js";
-                    return resolveExports(global.__webpack_require__(name));
-                } catch {
-                    console.error("Failed to resolve as kitch, relative path, and node_modules: " + id);
-                    console.log(process.cwd());
-                    console.log(fs.readdirSync("."));
-                    return undefined;
-                }
+                id = path.isAbsolute(id) ? id : path.join(appRoot, id);
+                console.log("Failed, resolving as absolute non-alias: " + id);
+                return oldRequire(id);
             }
         },
         {

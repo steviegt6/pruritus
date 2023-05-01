@@ -11,8 +11,10 @@
         "baseUrl": "./src",
         "outDir": "../../dist/pruritus",
         "paths": {
+            "@itch/*": ["../node_modules/kitch/src/*"],
+            "@itch-modules/*": ["../node_modules/*"],
             "@pruritus/*": ["./*"],
-            "@itch/*": ["../node_modules/kitch/src/*"]
+            "@spitroast": ["../node_modules/spitroast/dist/types"]
         },
 
         "strict": true,

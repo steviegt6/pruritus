@@ -1,3 +1,5 @@
-import env from "kitch/src/common/env";
+import env from "@itch/common/env";
 console.log(env);
+import spitroast from "@spitroast";
+console.log(spitroast);
 //throw new Error(env.toString());

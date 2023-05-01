@@ -6,14 +6,15 @@
     },
     "jsc": {
         "baseUrl": "./src/",
-        "target": "es2020",
+        "target": "es2022",
         "parser": {
             "syntax": "typescript",
             "tsx": true
         },
         "paths": {
-            "@pruritus/*": ["./*"],
-            "@itch/*": ["kitch/src/*"]
+            // These are defined in tsconfig.json but handled specially by our hijacked require() function.
+            //"@pruritus/*": ["./*"],
+            //"@itch/*": ["kitch/src/*"]
         }
     },
     "sourceMaps": true
