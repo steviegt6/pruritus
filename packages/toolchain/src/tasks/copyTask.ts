@@ -37,7 +37,10 @@ function copyDirSync(src: string, dest: string) {
         const srcPath = join(src, entry.name);
         const destPath = join(dest, entry.name);
         if (entry.isDirectory()) copyDirSync(srcPath, destPath);
-        else copyFileSync(srcPath, destPath);
+        else {
+            mkdirSync(dest, { recursive: true });
+            copyFileSync(srcPath, destPath);
+        }
     }
 }
 

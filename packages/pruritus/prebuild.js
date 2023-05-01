@@ -1,4 +1,4 @@
 const fs = require("fs");
 
 console.log("Deleting old build...");
-fs.rmdirSync("../../dist/pruritus", { recursive: true });
+if (fs.existsSync("../../dist/pruritus")) fs.rmdirSync("../../dist/pruritus", { recursive: true });
