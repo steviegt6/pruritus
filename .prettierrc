@@ -2,7 +2,7 @@
     "semi": true,
     "trailingComma": "none",
     "singleQuote": false,
-    "printWidth": 300,
+    "printWidth": 120,
     "tabWidth": 4,
     "useTabs": false,
     "withNodeModules": true,
